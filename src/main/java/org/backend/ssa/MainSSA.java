@@ -35,7 +35,7 @@ public class MainSSA {
 		m.getListe_instructions().add(new Affect(v1,new Cst(1)));
 		m.getListe_instructions().add(new Affect(v2,new Cst(50)));
 		m.getListe_instructions().add(new Affect(v3,new Cst(86)));
-		System.out.println("res="+p.toString());
+		System.out.println("res="+ p);
 		/*ass=new AssembleurJvm();
 		try {
 			ass.assemble(p);
