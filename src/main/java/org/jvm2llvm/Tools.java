@@ -24,8 +24,8 @@ public class Tools
         //System.out.println( "Hello World!" );
 	    //C:\Users\Alain\Documents\Visual Studio 2010\Projects\tjvm\java
 	    //
-	    f=new File("C:\\projet\\jvm2llvm\\doc\\tools\\opcodes3.csv");
-	    rep_out=new File("C:\\projet\\jvm2llvm\\src\\main\\java\\org\\jvm2llvm");
+	    f=new File("D:\\projet\\jvm2llvm\\doc\\tools\\opcodes3.csv");
+	    rep_out=new File("D:\\projet\\jvm2llvm\\src\\main\\java\\org\\jvm2llvm");
 	    list=read_csv(f);
 	    System.out.println("liste="+list);
 	    genere(list,rep_out);
@@ -125,7 +125,7 @@ public class Tools
 
 		s+="\n#endif\n";*/
 		try {
-		 Files.write(s, f_h, Charsets.ISO_8859_1);
+		 Files.write(s, f_h, Charsets.UTF_8);
 		} catch( IOException e ) {
 		 e.printStackTrace();
 		}

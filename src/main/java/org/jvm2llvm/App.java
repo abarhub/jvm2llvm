@@ -28,7 +28,7 @@ public class App
 
 		read=new ReadFile();
 
-		res=read.read("C:\\projet\\jvm2llvm\\target\\classes\\org\\jvm2llvm\\Test1.class");
+		res=read.read("D:\\projet\\jvm2llvm\\target\\classes\\org\\jvm2llvm\\Test1.class");
 
 		System.out.println("res="+res);
 
