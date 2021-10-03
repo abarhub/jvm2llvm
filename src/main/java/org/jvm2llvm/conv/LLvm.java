@@ -88,7 +88,7 @@ public class LLvm {
 		out.println("************ LLVM ****************");
 		out.flush();
 
-		System.out.println("LLVM:\n"+buf.toString());
+		System.out.println("LLVM:\n"+ buf);
 	}
 
 	private String conv(Instr instr) {

@@ -8,3 +8,8 @@ Il y a 3 main :
 - src/main/java/org/jvm2llvm/Tools.java : Pour générer le programme de conversion du CSV doc/tools/opcodes3.csv en  une classe Enum Java
 - src/main/java/org/jvm2llvm/App.java : Le programme principal
 
+La source doit être compilée en java 6.
+Pour l'instant, seule les affectations fonctionnent.
+La création de l'executable ne fonctionne pas.
+
+
