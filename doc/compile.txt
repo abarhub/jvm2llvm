@@ -1,0 +1,31 @@
+
+Pour compiler l'exemple qui est dans le répertoire llvm, il faut executer :
+
+* clang -c hello.c -emit-llvm -o hello.bc
+génère un fichier bc
+
+* llvm-dis < hello.bc >hello.ll
+converti le bc en ll
+
+* llc -filetype=obj hello.ll
+compile le ll en obj
+
+* link hello.obj -defaultlib:libcmt
+génère un executable
+
+Pour que la compilation fonctionne, il faut llvm 12 et visual c++ 19.
+Pour que visual c++ soit dans le path, il faut executer la commande :
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
+
+plus d'explication ici :
+https://releases.llvm.org/12.0.1/docs/GettingStartedVS.html
+
+****************************
+
+Le programme génère un fichier res.ll dans le répertoire target\resultat.
+Pour le compiler, il faut executer :
+llc -filetype=obj res.ll
+link res.obj -defaultlib:libcmt
+Cela génère un executable res.exe
+Il n'affiche rien.
+

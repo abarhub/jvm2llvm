@@ -1,13 +1,17 @@
 package org.jvm2llvm.conv;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import org.backend.ssa.intermediaire.*;
 import org.jvm2llvm.EOpCode;
 import org.jvm2llvm.tcclass.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -28,19 +32,37 @@ public class LLvm {
 		Preconditions.checkNotNull(classe);
 		if(classe.getMethodList()!=null&&!classe.getMethodList().isEmpty())
 		{
+
+			File file=new File("target/resultat/res.ll");
+
+			try {
+			file.getParentFile().mkdirs();
+			Files.write("",file,Charsets.UTF_8);
+			}catch(IOException e){
+				System.err.println("Erreur pour ecrire le fichier "+file+" : "+e.getMessage());
+			}
+
 			for(TMethodInfo methode:classe.getMethodList())
 			{
-				analyse(classe,methode);
+				analyse(classe,methode, file);
+			}
+
+			// fonction main
+			try {
+				Files.append(generationMain(), file, Charsets.UTF_8);
+			}catch(IOException e){
+				System.err.println("Erreur pour ecrire le fichier "+file+" : "+e.getMessage());
 			}
 		}
 	}
 
-	private void analyse(TClass classe, TMethodInfo methode) {
+	private void analyse(TClass classe, TMethodInfo methode, File file) {
 		List<InstrJvm> liste_instr;
 		Methode methode_llvm;
 		Preconditions.checkNotNull(classe);
 		Preconditions.checkNotNull(methode);
 
+		StringBuilder res=new StringBuilder();
 		liste_instr= Lists.newArrayList();
 		if(methode.getAttrList()!=null) {
 			for (TAttributInfo attr : methode.getAttrList()) {
@@ -53,42 +75,77 @@ public class LLvm {
 						System.out.println("analyse="+liste_instr);
 						methode_llvm=convLlvm(classe, methode, liste_instr,code);
 						System.out.println("methode="+methode_llvm);
-						affiche_llvm(classe, methode,methode_llvm);
+						res.append(affiche_llvm(classe, methode,methode_llvm));
+						res.append("\n");
 						methode_llvm.calcul_basic_bloc();
 					}
 				}
 			}
 		}
+		try {
+			Files.append(res, file, Charsets.UTF_8);
+		}catch(IOException e){
+			System.err.println("Erreur pour ecrire le fichier "+file+" : "+e.getMessage());
+		}
 	}
 
-	private void affiche_llvm(TClass classe, TMethodInfo methode, Methode methode_llvm) {
+	private String generationMain() {
+		ByteArrayOutputStream buf=new ByteArrayOutputStream();
+		PrintStream out=new PrintStream(buf);
 		String res;
-		ByteArrayOutputStream buf;
-		PrintStream out;
-		//String
-		buf=new ByteArrayOutputStream();
-		out=new PrintStream(buf);
-
-		out.println("************ LLVM ****************");
+		out.println(";************ LLVM main ****************");
 		out.println();
 		out.println();
 
-		out.println("define i32 @sum() {");
+		out.println("define dso_local i32 @main() #0 {");
+		out.println("entry:");
+
+		out.println("\tret i32 0");
+
+		out.println("}");
+
+		out.println();
+		out.println();
+		out.println(";************ LLVM ****************");
+		out.flush();
+
+		res=buf.toString();
+		System.out.println("LLVM main:\n"+ res);
+		return res;
+	}
+
+	private String affiche_llvm(TClass classe, TMethodInfo methode, Methode methode_llvm) {
+		String res;
+		ByteArrayOutputStream buf=new ByteArrayOutputStream();
+		PrintStream out=new PrintStream(buf);
+
+		out.println(";************ LLVM ****************");
+		out.println();
+		out.println();
+
+		out.println("define i32 @sum_"+nettoie_nom_methode(classe.getUtf8(methode.getName()))+"() {");
 		out.println("entry:");
 		//if()
 		for(Instr instr:methode_llvm.getListe_instructions())
 		{
 			out.println("\t"+conv(instr));
 		}
+		out.println("\tret i32 0");
 
 		out.println("}");
 
 		out.println();
 		out.println();
-		out.println("************ LLVM ****************");
+		out.println(";************ LLVM ****************");
 		out.flush();
 
-		System.out.println("LLVM:\n"+ buf);
+		res=buf.toString();
+		System.out.println("LLVM:\n"+ res);
+		return res;
+	}
+
+	private String nettoie_nom_methode(String s) {
+		return s.replaceAll("<","_").replaceAll(">","_");
 	}
 
 	private String conv(Instr instr) {
@@ -96,7 +153,13 @@ public class LLvm {
 		if(instr instanceof Affect)
 		{
 			Affect affect= (Affect) instr;
-			return "%"+affect.getVar().getNomVar()+" = "+conv(affect.getExpr());
+			Expr exp = affect.getExpr();
+			if(exp instanceof Cst){
+				exp=new ExprOpe(Operation.PLUSB,exp,new Cst(0));
+			} else if(exp instanceof Var){
+				exp=new ExprOpe(Operation.PLUSB,exp,new Cst(0));
+			}
+			return "%"+affect.getVar().getNomVar()+" = "+conv(exp);
 		}
 		return "";
 	}

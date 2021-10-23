@@ -6,3 +6,4 @@ target/
 *.o
 *.obj
 *.s
+llvm/hello.exe
