@@ -22,6 +22,7 @@ https://releases.llvm.org/12.0.1/docs/GettingStartedVS.html
 
 ****************************
 
+Le programme tester compile la classe org.jvm2llvm.Test1.
 Le programme génère un fichier res.ll dans le répertoire target\resultat.
 Pour le compiler, il faut executer :
 llc -filetype=obj res.ll
